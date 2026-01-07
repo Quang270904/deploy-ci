@@ -1,0 +1,43 @@
+name: Deploy prod tag to AWS CodeCommit
+
+# Trigger khi push tag bắt đầu bằng "prod"
+on:
+  push:
+    tags:
+      - 'prod*'
+
+jobs:
+  push-to-codecommit:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout code từ repo Laravel
+      - name: Checkout Laravel code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # lấy full history, cần để push tag
+
+      # Cấu hình git user
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+      # Thêm remote AWS CodeCommit
+      - name: Add CodeCommit remote
+        run: |
+          git remote add codecommit https://git-codecommit.ap-northeast-1.amazonaws.com/v1/repos/demo-exment
+
+      # Push tag lên CodeCommit
+      - name: Push tag to CodeCommit
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ap-northeast-1
+        run: |
+          # Cấu hình credential helper để git nhận AWS
+          git config --global credential.helper '!aws codecommit credential-helper $@'
+          git config --global credential.UseHttpPath true
+
+          # Push tất cả tag lên CodeCommit
+          git push codecommit --tags
