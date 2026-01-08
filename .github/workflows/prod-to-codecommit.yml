@@ -42,7 +42,7 @@ jobs:
         run: |
           git remote add codecommit https://git-codecommit.ap-northeast-1.amazonaws.com/v1/repos/demo-exment
 
-      # Push tag lên CodeCommit
-      - name: Push tag to CodeCommit
+      # Push code và tag lên CodeCommit
+      - name: Push code and tags to CodeCommit
         run: |
-          git push codecommit --tags
+          git push codecommit HEAD:master --tags
