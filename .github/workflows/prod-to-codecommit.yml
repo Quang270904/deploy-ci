@@ -45,4 +45,4 @@ jobs:
       # Push code và tag lên CodeCommit
       - name: Push code and tags to CodeCommit
         run: |
-          git push codecommit HEAD:master --tags
+          git push codecommit HEAD:refs/heads/master --tags
