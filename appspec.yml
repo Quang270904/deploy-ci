@@ -1,0 +1,59 @@
+version: 0.0
+os: linux
+
+# CodeDeploy spec cho Laravel deployment
+files:
+  - source: /
+    destination: /var/www/html/exment
+
+permissions:
+  - object: /var/www/html/exment
+    pattern: "**"
+    owner: www-data
+    group: www-data
+    mode: 755
+    type:
+      - directory
+      - file
+  - object: /var/www/html/exment/storage
+    pattern: "**"
+    owner: www-data
+    group: www-data
+    mode: 775
+    type:
+      - directory
+      - file
+  - object: /var/www/html/exment/bootstrap/cache
+    pattern: "**"
+    owner: www-data
+    group: www-data
+    mode: 775
+    type:
+      - directory
+      - file
+
+hooks:
+  ApplicationStop:
+    - location: scripts/application_stop.sh
+      timeout: 300
+      runas: root
+
+  BeforeInstall:
+    - location: scripts/before_install.sh
+      timeout: 300
+      runas: root
+
+  AfterInstall:
+    - location: scripts/after_install.sh
+      timeout: 300
+      runas: root
+
+  ApplicationStart:
+    - location: scripts/application_start.sh
+      timeout: 300
+      runas: root
+
+  ValidateService:
+    - location: scripts/validate_service.sh
+      timeout: 300
+      runas: root

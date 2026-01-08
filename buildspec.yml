@@ -1,0 +1,49 @@
+version: 0.2
+
+# CodeBuild spec cho Laravel app
+phases:
+  install:
+    runtime-versions:
+      php: 8.2
+      nodejs: 18
+    commands:
+      - echo "Installing dependencies..."
+      - php -v
+      - composer --version
+      - node --version
+      
+  pre_build:
+    commands:
+      - echo "Pre-build phase - Installing Composer dependencies"
+      - composer install --no-dev --optimize-autoloader --no-interaction
+      - echo "Installing NPM dependencies"
+      - npm ci
+      
+  build:
+    commands:
+      - echo "Build phase - Compiling assets"
+      - npm run build
+      - echo "Optimizing Laravel"
+      - php artisan config:cache
+      - php artisan route:cache
+      - php artisan view:cache
+      
+  post_build:
+    commands:
+      - echo "Post-build phase - Preparing artifacts"
+      - echo "Build completed on $(date)"
+
+artifacts:
+  files:
+    - '**/*'
+  exclude-paths:
+    - node_modules/**/*
+    - tests/**/*
+    - .git/**/*
+    - .github/**/*
+    - storage/logs/**/*
+
+cache:
+  paths:
+    - 'vendor/**/*'
+    - 'node_modules/**/*'
